@@ -1,0 +1,70 @@
+[
+{
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+        "category_name": "Ягода",
+        "category_description": "Просто ягоды, вкусные наверное, кроме брусники("
+    }
+},
+{
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+        "category_name": "Овощи",
+        "category_description": ""
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+        "product_name": "Клубника",
+        "product_description": "",
+        "product_photo": "",
+        "product_category": 1,
+        "product_price": 210,
+        "created_at": "2026-03-29T18:28:54Z",
+        "updated_at": "2026-03-29T18:28:56Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+        "product_name": "Помидор",
+        "product_description": "",
+        "product_photo": "",
+        "product_category": 2,
+        "product_price": 140,
+        "created_at": "2026-03-29T18:29:17Z",
+        "updated_at": "2026-03-29T18:29:18Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+        "product_name": "Огурец",
+        "product_description": "",
+        "product_photo": "",
+        "product_category": 2,
+        "product_price": 300,
+        "created_at": "2026-03-29T18:29:38Z",
+        "updated_at": "2026-03-29T18:29:39Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 5,
+    "fields": {
+        "product_name": "Лук",
+        "product_description": "",
+        "product_photo": "",
+        "product_category": 2,
+        "product_price": 70,
+        "created_at": "2026-03-29T18:29:53Z",
+        "updated_at": "2026-03-29T18:29:55Z"
+    }
+}
+]
