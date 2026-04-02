@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card p-4 shadow-sm">
+
+    <h2>{{ product.product_name }}</h2>
+
+    {% if product.product_photo %}
+        <img src="{{ product.product_photo.url }}" class="img-fluid mb-3">
+    {% endif %}
+
+    <p>{{ product.product_description }}</p>
+
+    <p><b>Категория:</b> {{ product.product_category }}</p>
+
+    <p class="fw-bold fs-4">
+        💰 {{ product.product_price }}
+    </p>
+
+    <a href="/" class="btn btn-secondary">Назад</a>
+
+</div>
+
+{% endblock %}

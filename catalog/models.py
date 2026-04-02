@@ -2,20 +2,16 @@ from django.db import models
 
 
 class Category(models.Model):
-    category_name = (
-        models.CharField(
-            max_length=150,
-            verbose_name="Название категории",
-            help_text="Введите категорию продукта",
-        )
+    category_name = models.CharField(
+        max_length=150,
+        verbose_name="Название категории",
+        help_text="Введите категорию продукта",
     )
-    category_description = (
-        models.TextField(
-            verbose_name="Описание категории",
-            help_text="Опишите категорию",
-            blank=True,
-            null=True,
-        )
+    category_description = models.TextField(
+        verbose_name="Описание категории",
+        help_text="Опишите категорию",
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -27,17 +23,13 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    product_name = (
-        models.CharField(
-            max_length=150,
-            verbose_name="Наименование продукта",
-            help_text="Введите наименование продукта",
-        )
+    product_name = models.CharField(
+        max_length=150,
+        verbose_name="Наименование продукта",
+        help_text="Введите наименование продукта",
     )
-    product_description = (
-        models.TextField(
-            verbose_name="Описание", help_text="Опишите продукт", blank=True, null=True
-        )
+    product_description = models.TextField(
+        verbose_name="Описание", help_text="Опишите продукт", blank=True, null=True
     )
     product_photo = models.ImageField(
         upload_to="products/photo",
