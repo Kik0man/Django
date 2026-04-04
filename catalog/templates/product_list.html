@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Список товаров{% endblock %}
+
+{% block content %}
+<h1>Список товаров</h1>
+<ul>
+    {% for product in page_obj %}
+        <li>
+            <strong>{{ product.product_name }}</strong><br>
+            {{ product.product_description|slice:":100" }}{% if product.product_description|length > 100 %}...{% endif %}<br>
+            Категория: {{ product.product_category }}<br>
+            Цена: {{ product.product_price }} руб.<br>
+            <a href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
+        </li>
+    {% empty %}
+        <li>Товары не найдены.</li>
+    {% endfor %}
+</ul>
+
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+    {% endif %}
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперед →</a>
+    {% endif %}
+</div>
+{% endblock %}
