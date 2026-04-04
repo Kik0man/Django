@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db import connection
 from catalog.models import Category, Product
 from datetime import datetime
 
@@ -12,14 +13,20 @@ class Command(BaseCommand):
         Product.objects.all().delete()
         Category.objects.all().delete()
 
+        # Сбрасываем счетчик ID для Product
+        with connection.cursor() as cursor:
+            cursor.execute("ALTER SEQUENCE catalog_product_id_seq RESTART WITH 1;")
+
         self.stdout.write("Создаем категории...")
 
         electronics = Category.objects.create(
-            category_name="Электроника", category_description="Гаджеты и техника"
+            category_name="Электроника",
+            category_description="Гаджеты и техника"
         )
 
         clothes = Category.objects.create(
-            category_name="Одежда", category_description="Повседневная одежда"
+            category_name="Одежда",
+            category_description="Повседневная одежда"
         )
 
         self.stdout.write("Создаем продукты...")
@@ -30,29 +37,17 @@ class Command(BaseCommand):
                 "product_description": "Смартфон Apple",
                 "product_category": electronics,
                 "product_price": 1000,
-                "created_at": datetime.now(),
-                "updated_at": datetime.now(),
             },
             {
                 "product_name": "Футболка",
                 "product_description": "Белая футболка",
                 "product_category": clothes,
                 "product_price": 20,
-                "created_at": datetime.now(),
-                "updated_at": datetime.now(),
             },
         ]
 
         for product_data in products:
-            product, created = Product.objects.get_or_create(**product_data)
-
-            if created:
-                self.stdout.write(
-                    self.style.SUCCESS(f"Добавлен продукт: {product.product_name}")
-                )
-            else:
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"Продукт уже существует: {product.product_name}"
-                    )
-                )
+            product = Product.objects.create(**product_data)
+            self.stdout.write(
+                self.style.SUCCESS(f"Добавлен продукт: {product.product_name} (ID: {product.id})")
+            )
