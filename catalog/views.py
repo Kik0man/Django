@@ -1,31 +1,61 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
+from django.views.generic import ListView, DetailView, CreateView, TemplateView
+from django.urls import reverse_lazy
 from .models import Product
 from .forms import ProductForm
-from django.core.paginator import Paginator
 
-def home(request):
-    return render(request, 'home.html')
 
-def contacts(request):
-    return render(request, 'contacts.html')
+class HomeView(TemplateView):
+    """Главная страница"""
+    template_name = 'home.html'
 
-def product_list(request):
-    products = Product.objects.all().order_by('id')
-    paginator = Paginator(products, 5)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'product_list.html', {'page_obj': page_obj})
 
-def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    return render(request, 'product_detail.html', {'product': product})
+class ContactsView(TemplateView):
+    """Страница контактов"""
+    template_name = 'contacts.html'
 
-def product_create(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('catalog:product_list')  # 👈 ДОБАВЬТЕ 'catalog:'
-    else:
-        form = ProductForm()
-    return render(request, 'product_form.html', {'form': form})
+    def post(self, request, *args, **kwargs):
+        # Обработка POST запроса для формы обратной связи
+        context = self.get_context_data(**kwargs)
+        # Здесь можно добавить логику отправки сообщения
+        # Например: отправка email, сохранение в БД и т.д.
+        return self.render_to_response(context)
+
+
+class ProductListView(ListView):
+    """Список продуктов с пагинацией"""
+    model = Product
+    template_name = 'product_list.html'
+    context_object_name = 'page_obj'  # Сохраняем имя для совместимости с шаблоном
+    paginate_by = 5
+    ordering = ['id']  # Сортировка по id
+
+    def get_queryset(self):
+        """Получение отсортированного queryset"""
+        return super().get_queryset().order_by('id')
+
+    def get_context_data(self, **kwargs):
+        """Добавляем page_obj в контекст для совместимости с шаблоном"""
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ProductDetailView(DetailView):
+    """Детальная страница продукта"""
+    model = Product
+    template_name = 'product_detail.html'
+    context_object_name = 'product'
+    pk_url_kwarg = 'pk'
+
+
+class ProductCreateView(CreateView):
+    """Создание нового продукта"""
+    model = Product
+    form_class = ProductForm
+    template_name = 'product_form.html'
+    success_url = reverse_lazy('catalog:product_list')
+
+    def form_valid(self, form):
+        """Дополнительная обработка при успешном сохранении"""
+        return super().form_valid(form)

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'blog:list' %}">Блог</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                {% if post.preview %}
+                    <img src="{{ post.preview.url }}" class="card-img-top" alt="{{ post.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title">{{ post.title }}</h1>
+                    
+                    <div class="d-flex justify-content-between mb-4">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> Создано: {{ post.created_at|date:"d.m.Y H:i" }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="bi bi-eye"></i> Просмотров: {{ post.views_count }}
+                        </small>
+                    </div>
+                    
+                    <div class="card-text">
+                        {{ post.content|linebreaks }}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'blog:list' %}" class="btn btn-secondary">← Назад к списку</a>
+                        <div>
+                            <a href="{% url 'blog:update' post.pk %}" class="btn btn-primary">Редактировать</a>
+                            <a href="{% url 'blog:delete' post.pk %}" class="btn btn-danger">Удалить</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
