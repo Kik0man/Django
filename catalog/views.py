@@ -1,7 +1,6 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, TemplateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from django.urls import reverse_lazy
+from django.contrib import messages
 from .models import Product
 from .forms import ProductForm
 
@@ -18,8 +17,7 @@ class ContactsView(TemplateView):
     def post(self, request, *args, **kwargs):
         # Обработка POST запроса для формы обратной связи
         context = self.get_context_data(**kwargs)
-        # Здесь можно добавить логику отправки сообщения
-        # Например: отправка email, сохранение в БД и т.д.
+        messages.success(request, 'Сообщение отправлено!')
         return self.render_to_response(context)
 
 
@@ -27,18 +25,13 @@ class ProductListView(ListView):
     """Список продуктов с пагинацией"""
     model = Product
     template_name = 'product_list.html'
-    context_object_name = 'page_obj'  # Сохраняем имя для совместимости с шаблоном
+    context_object_name = 'page_obj'
     paginate_by = 5
-    ordering = ['id']  # Сортировка по id
+    ordering = ['id']
 
     def get_queryset(self):
         """Получение отсортированного queryset"""
         return super().get_queryset().order_by('id')
-
-    def get_context_data(self, **kwargs):
-        """Добавляем page_obj в контекст для совместимости с шаблоном"""
-        context = super().get_context_data(**kwargs)
-        return context
 
 
 class ProductDetailView(DetailView):
@@ -50,7 +43,7 @@ class ProductDetailView(DetailView):
 
 
 class ProductCreateView(CreateView):
-    """Создание нового продукта"""
+    """Создание нового продукта с валидацией"""
     model = Product
     form_class = ProductForm
     template_name = 'product_form.html'
@@ -58,4 +51,35 @@ class ProductCreateView(CreateView):
 
     def form_valid(self, form):
         """Дополнительная обработка при успешном сохранении"""
+        messages.success(self.request, 'Продукт успешно создан!')
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """Обработка невалидной формы"""
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f'Ошибка в поле {field}: {error}')
+        return super().form_invalid(form)
+
+
+class ProductUpdateView(UpdateView):
+    """Редактирование продукта с валидацией"""
+    model = Product
+    form_class = ProductForm
+    template_name = 'product_form.html'
+    success_url = reverse_lazy('catalog:product_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Продукт успешно обновлен!')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f'Ошибка в поле {field}: {error}')
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_update'] = True
+        return context

@@ -2,12 +2,46 @@
 {% block title %}{{ product.product_name }}{% endblock %}
 
 {% block content %}
-<h1>{{ product.product_name }}</h1>
-<p>{{ product.product_description }}</p>
-<p>Категория: {{ product.product_category }}</p>
-<p>Цена: {{ product.product_price }} руб.</p>
-{% if product.product_photo %}
-    <img src="{{ product.product_photo.url }}" alt="{{ product.product_name }}">
-{% endif %}
-<a href="{% url 'catalog:product_list' %}">← Вернуться к списку</a>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                {% if product.product_photo %}
+                    <img src="{{ product.product_photo.url }}" class="card-img-top" alt="{{ product.product_name }}" style="max-height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title">{{ product.product_name }}</h1>
+                    <p class="card-text">{{ product.product_description }}</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <strong>Категория:</strong> {{ product.product_category }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Цена:</strong> {{ product.product_price }} руб.
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <small class="text-muted">Создан: {{ product.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Обновлен: {{ product.updated_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">← Вернуться к списку</a>
+                        <div>
+                            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-primary">Редактировать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
