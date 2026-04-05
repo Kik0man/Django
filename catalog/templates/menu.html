@@ -1,4 +1,7 @@
 <nav>
+    <a href="{% url 'catalog:home' %}">Главная</a> |
     <a href="{% url 'catalog:product_list' %}">Список продуктов</a> |
-    <a href="{% url 'catalog:product_create' %}">Добавить продукт</a>
+    <a href="{% url 'catalog:product_create' %}">Добавить продукт</a> |
+    <a href="{% url 'catalog:contacts' %}">Контакты</a> |
+    <a href="{% url 'blog:list' %}">Блог</a>
 </nav>
