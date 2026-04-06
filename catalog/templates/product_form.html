@@ -1,12 +1,110 @@
 {% extends 'base.html' %}
-{% block title %}Добавить продукт{% endblock %}
+{% load static %}
+
+{% block title %}{% if is_update %}Редактировать продукт{% else %}Добавить продукт{% endif %}{% endblock %}
 
 {% block content %}
-<h1>Добавить продукт</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Сохранить</button>
-    <a href="{% url 'catalog:product_list' %}">← Назад к списку</a>
-</form>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        {% if is_update %}
+                            Редактировать продукт
+                        {% else %}
+                            Добавить новый продукт
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+
+                                {% if field.errors %}
+                                    <div class="alert alert-danger mt-1">
+                                        {% for error in field.errors %}
+                                            <small>{{ error }}</small><br>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i>
+                                {% if is_update %}Сохранить изменения{% else %}Создать продукт{% endif %}
+                            </button>
+                            <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-lg"></i> Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if is_update %}
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-info">
+                            ← Вернуться к продукту
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Дополнительные стили для формы */
+    .form-control:focus,
+    .form-control-file:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-control.is-invalid,
+    .form-control-file.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .invalid-feedback {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+
+    .form-control-file {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+    }
+</style>
 {% endblock %}
