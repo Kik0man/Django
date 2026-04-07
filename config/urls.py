@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),  # главная страница из каталога
     path('blog/', include('blog.urls')),  # URL-адреса блога начинаются с blog/
+    path('users/', include('users.urls')),
 ]
 
 if settings.DEBUG:
