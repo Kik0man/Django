@@ -6,9 +6,7 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <div class="card">
-                {% if product.product_photo %}
-                    <img src="{{ product.product_photo.url }}" class="card-img-top" alt="{{ product.product_name }}" style="max-height: 400px; object-fit: cover;">
-                {% endif %}
+                <!-- ... картинка, заголовок, описание ... -->
                 <div class="card-body">
                     <h1 class="card-title">{{ product.product_name }}</h1>
                     <p class="card-text">{{ product.product_description }}</p>
@@ -24,10 +22,15 @@
 
                     <div class="row mt-2">
                         <div class="col-md-6">
-                            <small class="text-muted">Создан: {{ product.created_at|date:"d.m.Y H:i" }}</small>
+                            <strong>Статус:</strong>
+                            {% if product.is_published %}
+                                <span class="badge bg-success">Опубликован</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Не опубликован</span>
+                            {% endif %}
                         </div>
                         <div class="col-md-6">
-                            <small class="text-muted">Обновлен: {{ product.updated_at|date:"d.m.Y H:i" }}</small>
+                            <small class="text-muted">Создан: {{ product.created_at|date:"d.m.Y H:i" }}</small>
                         </div>
                     </div>
 
@@ -36,7 +39,23 @@
                     <div class="d-flex justify-content-between">
                         <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">← Вернуться к списку</a>
                         <div>
-                            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-primary">Редактировать</a>
+                            {% if user == product.owner %}
+                                <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-primary">Редактировать</a>
+                            {% endif %}
+
+                            {% if user == product.owner or perms.catalog.delete_product %}
+                                <form action="{% url 'catalog:product_delete' product.pk %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот продукт?')">Удалить</button>
+                                </form>
+                            {% endif %}
+
+                            {% if perms.catalog.can_unpublish_product and product.is_published %}
+                                <form action="{% url 'catalog:product_unpublish' product.pk %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отменить публикацию продукта?')">Отменить публикацию</button>
+                                </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

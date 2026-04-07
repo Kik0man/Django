@@ -16,7 +16,8 @@ class ProductForm(forms.ModelForm):
             'product_description',
             'product_category',
             'product_price',
-            'product_photo'  # Добавляем поле для фото
+            'product_photo',  # Добавляем поле для фото
+            'is_published',
         ]
         labels = {
             'product_name': 'Наименование продукта',
