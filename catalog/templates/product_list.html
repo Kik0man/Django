@@ -15,11 +15,21 @@
             <br>
             {{ product.product_description|slice:":100" }}...
             <br>
-            Категория: {{ product.product_category }}<br>
+            Категория: {{ product.product_category|default:"Без категории" }}<br>
             Цена: {{ product.product_price }} руб.<br>
             <a href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
             {% if user == product.owner %}
                 <a href="{% url 'catalog:product_update' product.pk %}">[Редактировать]</a>
+            {% endif %}
+
+            {# Ссылка на категорию только если она существует #}
+            {% if product.product_category %}
+                <p>
+                    Категория:
+                    <a href="{% url 'catalog:products_by_category' product.product_category.id %}">
+                        {{ product.product_category.category_name }}
+                    </a>
+                </p>
             {% endif %}
         </li>
     {% empty %}

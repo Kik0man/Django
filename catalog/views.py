@@ -3,8 +3,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Product
+from .models import Product, Category
 from .forms import ProductForm
+from .services import get_products_by_category
+from django.core.cache import cache
 
 
 class HomeView(TemplateView):
@@ -23,15 +25,28 @@ class ContactsView(TemplateView):
 
 
 class ProductListView(ListView):
-    """Список продуктов (общедоступный)"""
     model = Product
     template_name = 'product_list.html'
     context_object_name = 'page_obj'
     paginate_by = 5
-    ordering = ['id']
 
     def get_queryset(self):
-        return super().get_queryset().order_by('id')
+        # Ключ кеша может зависеть от номера страницы и параметров сортировки
+        page = self.request.GET.get('page', 1)
+        cache_key = f'product_list_page_{page}'
+        queryset = cache.get(cache_key)
+
+        if queryset is None:
+            queryset = list(Product.objects.all().order_by('id'))
+            cache.set(cache_key, queryset, 60 * 5)  # 5 минут
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        # Пагинация работает с обычным списком, нужно вручную нарезать
+        context = super().get_context_data(**kwargs)
+        # После получения всего списка, пагинация уже выполнена в родительском методе
+        return context
 
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
@@ -124,3 +139,22 @@ class ProductUnpublishView(LoginRequiredMixin, UserPassesTestMixin, View):
         product.save(update_fields=['is_published'])
         messages.success(request, f'Публикация продукта "{product.product_name}" отменена.')
         return redirect('catalog:product_detail', pk=pk)
+
+
+class ProductsByCategoryView(ListView):
+    template_name = 'products_by_category.html'
+    context_object_name = 'products'
+    paginate_by = 10
+
+    def dispatch(self, request, *args, **kwargs):
+        # Проверяем существование категории до выполнения запроса
+        self.category = get_object_or_404(Category, pk=kwargs['category_id'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return get_products_by_category(self.category.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
