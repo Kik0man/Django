@@ -151,4 +151,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # URL для входа
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/product_list/'
-LOGOUT_REDIRECT_URL = '/product_list/'
+LOGOUT_REDIRECT_URL = '/'
