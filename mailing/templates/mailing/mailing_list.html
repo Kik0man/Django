@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Рассылки{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Рассылки</h1>
+    <a href="{% url 'mailing:mailing_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Создать рассылку
+    </a>
+</div>
+
+{% if mailings %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Начало</th>
+                    <th>Окончание</th>
+                    <th>Статус</th>
+                    <th>Сообщение</th>
+                    <th>Владелец</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mailing in mailings %}
+                <tr>
+                    <td>{{ mailing.id }}</td>
+                    <td>{{ mailing.start_time|date:"d.m.Y H:i" }}</td>
+                    <td>{{ mailing.end_time|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if mailing.status == 'created' %}bg-secondary
+                            {% elif mailing.status == 'started' %}bg-success
+                            {% else %}bg-dark{% endif %}">
+                            {{ mailing.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ mailing.message.subject|truncatechars:30 }}</td>
+                    <td>{{ mailing.owner.email }}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'mailing:mailing_detail' mailing.pk %}" class="btn btn-sm btn-outline-info" title="Просмотр">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if mailing.owner == user %}
+                                <a href="{% url 'mailing:mailing_update' mailing.pk %}" class="btn btn-sm btn-outline-warning" title="Редактировать">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            {% endif %}
+                            {% if mailing.status == 'started' and mailing.owner == user %}
+                                <form method="post" action="{% url 'mailing:mailing_send' mailing.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Запустить отправку">
+                                        <i class="bi bi-send"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if perms.mailing.can_disable_mailing and mailing.status == 'started' %}
+                                {# Здесь можно добавить кнопку "Отключить рассылку" для менеджеров #}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'includes/pagination.html' %}
+{% else %}
+    <div class="alert alert-info">
+        У вас пока нет рассылок. <a href="{% url 'mailing:mailing_create' %}">Создайте первую</a>.
+    </div>
+{% endif %}
+{% endblock %}
