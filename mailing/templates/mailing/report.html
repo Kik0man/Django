@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчет по рассылкам{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Статистика по вашим рассылкам</h1>
+
+{% if mailings %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID рассылки</th>
+                    <th>Сообщение</th>
+                    <th>Статус</th>
+                    <th>Успешных попыток</th>
+                    <th>Неуспешных попыток</th>
+                    <th>Всего отправлено</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mailing in mailings %}
+                <tr>
+                    <td>
+                        <a href="{% url 'mailing:mailing_detail' mailing.pk %}">#{{ mailing.id }}</a>
+                    </td>
+                    <td>{{ mailing.message.subject }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if mailing.status == 'created' %}bg-secondary
+                            {% elif mailing.status == 'started' %}bg-success
+                            {% else %}bg-dark{% endif %}">
+                            {{ mailing.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ mailing.success_attempts }}</td>
+                    <td>{{ mailing.failed_attempts }}</td>
+                    <td>{{ mailing.success_attempts|add:mailing.failed_attempts }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">У вас пока нет рассылок для отображения статистики.</div>
+{% endif %}
+{% endblock %}
